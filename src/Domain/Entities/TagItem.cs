@@ -7,7 +7,14 @@ using System.Threading.Tasks;
 namespace Todo_App.Domain.Entities;
 public class TagItem:BaseAuditableEntity
 {
-   // public int TagID { get; set; }
-    public string? TagName { get; set; }
-    public ICollection<TodoItem>? TodoItems { get; set; }
+
+    public string? TagName { get;  set; }
+    public ICollection<TodoItem>? TodoItems { get;  set; }
+
+    private TagItem(){}
+
+    public TagItem(string tagName)
+    {
+        TagName = tagName;
+    }
 }
