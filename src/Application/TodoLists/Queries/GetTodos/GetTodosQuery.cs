@@ -36,7 +36,7 @@ public class GetTodosQueryHandler : IRequestHandler<GetTodosQuery, TodosVm>
                 .ProjectTo<TodoListDto>(_mapper.ConfigurationProvider)
                 .OrderBy(t => t.Title)
                 .ToListAsync(cancellationToken),
-            Colour = Colour.GetSupportedColors().Select(c => new ColourDto { Colour = c.Code.ToString() }).ToList()
+            Colour = Colour.GetSupportedColors().Select(c => new ColourDto { Colour = c.Code }).ToList()
                 
         };
       
