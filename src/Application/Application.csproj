@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="TagItems\Commands\" />
+      <Folder Include="TagItems\Commands\DeleteTagItem\" />
       <Folder Include="TagItems\EventHandlers\" />
     </ItemGroup>
 

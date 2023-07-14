@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Todo_App.Application.TagItems.Commands.CreateTagItem;
+using Todo_App.Application.TagItems.Commands.UpdateTagItem;
 using Todo_App.Application.TagItems.Queries.GetTagItems;
 using Todo_App.Application.TagItems.Queries.TodoITemTags;
 
@@ -39,5 +41,20 @@ public class TaggingController : ApiControllerBase
     [HttpGet("{filter}")]
     public async Task<IEnumerable<FilterByTagQuery>> FilterByTagName(string filter) {
         return await _mediator.Send(new FilterByTagQuery { TagName = filter});
+    }
+
+    [HttpPost("[action]")]
+
+    public async Task<ActionResult<int>> CreateTagItem(CreateTagItemCommand createTagItemCommand) {
+
+        return await _mediator.Send(createTagItemCommand);
+    
+    }
+
+    [HttpPut("[action]")]
+    public async Task<ActionResult> UpdateTagItem(UpdateTagItemCommand updateTagItemCommand) {
+
+        await _mediator.Send(updateTagItemCommand);
+        return NoContent();
     }
 }
