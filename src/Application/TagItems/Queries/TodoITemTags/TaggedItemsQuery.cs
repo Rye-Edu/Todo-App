@@ -35,6 +35,6 @@ public class TaggedITemsQueryHandler : IRequestHandler<TaggedItemsQuery, IEnumer
     {
         return await _context.TagItems.Where(id => id.Id == request.Id)
             .ProjectToListAsync<TaggedItemsQuery>(_mapper.ConfigurationProvider);
-        
+
     }
 }

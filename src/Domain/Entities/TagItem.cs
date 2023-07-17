@@ -11,7 +11,7 @@ public class TagItem:BaseAuditableEntity
     public string? TagName { get;  set; }
     public ICollection<TodoItem>? TodoItems { get;  set; }
 
-    private TagItem(){}
+    public TagItem(){}
 
     public TagItem(string tagName)
     {

@@ -11,6 +11,7 @@ namespace Todo_App.Application.TagItems.Commands.CreateTagItem;
 public class CreateTagItemCommand:IRequest<int>
 {
     public string? TagName { get; set; }
+    
 }
 
 public class CreateTagItemCommandHandler : IRequestHandler<CreateTagItemCommand, int>
@@ -23,7 +24,7 @@ public class CreateTagItemCommandHandler : IRequestHandler<CreateTagItemCommand,
     }
     public async Task<int> Handle(CreateTagItemCommand request, CancellationToken cancellationToken)
     {
-        var tagItem = new TagItem (request.TagName!);
+        var tagItem = new TagItem(request.TagName!);
         await _context.TagItems.AddAsync(tagItem);
         await _context.SaveChangesAsync(cancellationToken);
         return tagItem.Id;

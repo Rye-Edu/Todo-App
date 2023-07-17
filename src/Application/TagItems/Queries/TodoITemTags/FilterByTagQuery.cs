@@ -34,6 +34,7 @@ public class FilterByTagQueryHandler : IRequestHandler<FilterByTagQuery, IEnumer
 
         return await _context.TagItems.Where(tagName => tagName.TagName == request.TagName)
             .ProjectToListAsync<FilterByTagQuery>(_mapper.ConfigurationProvider);
+       
     }
 }
 

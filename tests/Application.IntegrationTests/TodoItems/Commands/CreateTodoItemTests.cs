@@ -35,7 +35,7 @@ public class CreateTodoItemTests : BaseTestFixture
         {
             ListId = listId,
             Title = "Tasks",
-            Colour = "#999999"
+          //  Colour = "#999999"
         };
 
         var itemId = await SendAsync(command);
@@ -46,7 +46,7 @@ public class CreateTodoItemTests : BaseTestFixture
         item!.ListId.Should().Be(command.ListId);
         item.Title.Should().Be(command.Title);
         item.CreatedBy.Should().Be(userId);
-        item.Colour.Should().Be((Colour)command.Colour);
+       // item.Colour.Should().Be((Colour)command.Colour);
         item.Created.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMilliseconds(10000));
         item.LastModifiedBy.Should().Be(userId);
         item.LastModified.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMilliseconds(10000));

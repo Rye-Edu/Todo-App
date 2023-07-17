@@ -44,7 +44,6 @@ public class TaggingController : ApiControllerBase
     }
 
     [HttpPost("[action]")]
-
     public async Task<ActionResult<int>> CreateTagItem(CreateTagItemCommand createTagItemCommand) {
 
         return await _mediator.Send(createTagItemCommand);

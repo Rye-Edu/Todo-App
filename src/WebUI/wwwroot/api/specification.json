@@ -388,6 +388,50 @@
         }
       }
     },
+    "/api/TodoItems/RemoveTag": {
+      "put": {
+        "tags": [
+          "TodoItems"
+        ],
+        "operationId": "TodoItems_RemoveTag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "removeTaggedTodoItem",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveTaggedTodoItemCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/TodoLists": {
       "get": {
         "tags": [
@@ -756,10 +800,6 @@
           "title": {
             "type": "string",
             "nullable": true
-          },
-          "colour": {
-            "type": "string",
-            "nullable": true
           }
         }
       },
@@ -792,6 +832,11 @@
             "type": "integer",
             "format": "int32"
           },
+          "tagItemId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
           "priority": {
             "$ref": "#/components/schemas/PriorityLevel"
           },
@@ -820,6 +865,20 @@
           2,
           3
         ]
+      },
+      "RemoveTaggedTodoItemCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "todoItemID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tagItemID": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
       },
       "TodosVm": {
         "type": "object",
