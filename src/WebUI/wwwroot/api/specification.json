@@ -6,6 +6,188 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/Tagging/tag-items": {
+      "get": {
+        "tags": [
+          "Tagging"
+        ],
+        "operationId": "Tagging_GetTagItems",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TagItemQuery"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Tagging/tagged-items/{id}": {
+      "get": {
+        "tags": [
+          "Tagging"
+        ],
+        "operationId": "Tagging_GetTaggedItems",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TaggedItemsQuery"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Tagging/tagged-items/all": {
+      "get": {
+        "tags": [
+          "Tagging"
+        ],
+        "operationId": "Tagging_GetAllTaggedItems",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AllTaggedItemsQuery"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Tagging/{filter}": {
+      "get": {
+        "tags": [
+          "Tagging"
+        ],
+        "operationId": "Tagging_FilterByTagName",
+        "parameters": [
+          {
+            "name": "filter",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FilterByTagQuery"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Tagging/CreateTagItem": {
+      "post": {
+        "tags": [
+          "Tagging"
+        ],
+        "operationId": "Tagging_CreateTagItem",
+        "requestBody": {
+          "x-name": "createTagItemCommand",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTagItemCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Tagging/UpdateTagItem": {
+      "put": {
+        "tags": [
+          "Tagging"
+        ],
+        "operationId": "Tagging_UpdateTagItem",
+        "requestBody": {
+          "x-name": "updateTagItemCommand",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTagItemCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/TodoItems": {
       "get": {
         "tags": [
@@ -185,6 +367,50 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UpdateTodoItemDetailCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/TodoItems/RemoveTag": {
+      "put": {
+        "tags": [
+          "TodoItems"
+        ],
+        "operationId": "TodoItems_RemoveTag",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "removeTaggedTodoItem",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveTaggedTodoItemCommand"
               }
             }
           },
@@ -390,6 +616,128 @@
   },
   "components": {
     "schemas": {
+      "TagItemQuery": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tagName": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TaggedItemsQuery": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tagName": {
+            "type": "string",
+            "nullable": true
+          },
+          "todoItems": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/TodoTagItemBriefVM"
+            }
+          }
+        }
+      },
+      "TodoTagItemBriefVM": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "listId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "done": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AllTaggedItemsQuery": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tagName": {
+            "type": "string",
+            "nullable": true
+          },
+          "todoItems": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/TodoTagItemBriefVM"
+            }
+          }
+        }
+      },
+      "FilterByTagQuery": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tagName": {
+            "type": "string",
+            "nullable": true
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "todoItems": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/TodoTagItemBriefVM"
+            }
+          }
+        }
+      },
+      "CreateTagItemCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "tagName": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "UpdateTagItemCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tagName": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "PaginatedListOfTodoItemBriefDto": {
         "type": "object",
         "additionalProperties": false,
@@ -484,10 +832,19 @@
             "type": "integer",
             "format": "int32"
           },
+          "tagItemId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
           "priority": {
             "$ref": "#/components/schemas/PriorityLevel"
           },
           "note": {
+            "type": "string",
+            "nullable": true
+          },
+          "colour": {
             "type": "string",
             "nullable": true
           }
@@ -509,6 +866,20 @@
           3
         ]
       },
+      "RemoveTaggedTodoItemCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "todoItemID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tagItemID": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "TodosVm": {
         "type": "object",
         "additionalProperties": false,
@@ -523,6 +894,12 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TodoListDto"
+            }
+          },
+          "colour": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ColourDto"
             }
           }
         }
@@ -594,6 +971,16 @@
           }
         }
       },
+      "ColourDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "colour": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "CreateTodoListCommand": {
         "type": "object",
         "additionalProperties": false,
@@ -613,6 +1000,10 @@
             "format": "int32"
           },
           "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "colour": {
             "type": "string",
             "nullable": true
           }

@@ -4,6 +4,7 @@ using Todo_App.Application.Common.Exceptions;
 using Todo_App.Application.TodoItems.Commands.CreateTodoItem;
 using Todo_App.Application.TodoLists.Commands.CreateTodoList;
 using Todo_App.Domain.Entities;
+using Todo_App.Domain.ValueObjects;
 
 namespace Todo_App.Application.IntegrationTests.TodoItems.Commands;
 
@@ -33,7 +34,8 @@ public class CreateTodoItemTests : BaseTestFixture
         var command = new CreateTodoItemCommand
         {
             ListId = listId,
-            Title = "Tasks"
+            Title = "Tasks",
+          //  Colour = "#999999"
         };
 
         var itemId = await SendAsync(command);
@@ -44,6 +46,7 @@ public class CreateTodoItemTests : BaseTestFixture
         item!.ListId.Should().Be(command.ListId);
         item.Title.Should().Be(command.Title);
         item.CreatedBy.Should().Be(userId);
+       // item.Colour.Should().Be((Colour)command.Colour);
         item.Created.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMilliseconds(10000));
         item.LastModifiedBy.Should().Be(userId);
         item.LastModified.Should().BeCloseTo(DateTime.Now, TimeSpan.FromMilliseconds(10000));

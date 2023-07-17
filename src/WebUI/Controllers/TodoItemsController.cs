@@ -48,6 +48,18 @@ public class TodoItemsController : ApiControllerBase
         return NoContent();
     }
 
+    [HttpPut("[action]")]
+
+    public async Task<ActionResult> RemoveTag(int id, RemoveTaggedTodoItemCommand removeTaggedTodoItem) {
+
+        if (id != removeTaggedTodoItem.TodoItemID) {
+            return BadRequest();
+        }
+        await Mediator.Send(removeTaggedTodoItem);
+
+        return NoContent();
+    }
+
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
     {
