@@ -9,6 +9,15 @@ namespace Todo_App.WebUI.Controllers;
 
 public class TodoListsController : ApiControllerBase
 {
+
+    [HttpGet("search-todolist/{search}")]
+    public async Task<ActionResult<TodosVm>> SearchTodoList(string search)
+    {
+
+       return await Mediator.Send(new SearchTodoListQuery { Title = search });
+ 
+    }
+
     [HttpGet]
     public async Task<ActionResult<TodosVm>> Get()
     {

@@ -15,12 +15,365 @@ import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angula
 
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
+export interface ITaggingClient {
+    getTagItems(): Observable<TagItemQuery[]>;
+    getTaggedItems(id: number): Observable<TaggedItemsQuery[]>;
+    getAllTaggedItems(): Observable<AllTaggedItemsQuery[]>;
+    filterByTagName(filter: string | null): Observable<FilterByTagQuery[]>;
+    createTagItem(createTagItemCommand: CreateTagItemCommand): Observable<number>;
+    updateTagItem(updateTagItemCommand: UpdateTagItemCommand): Observable<FileResponse>;
+}
+
+@Injectable({
+    providedIn: 'root'
+})
+export class TaggingClient implements ITaggingClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    getTagItems(): Observable<TagItemQuery[]> {
+        let url_ = this.baseUrl + "/api/Tagging/tag-items";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTagItems(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTagItems(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TagItemQuery[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TagItemQuery[]>;
+        }));
+    }
+
+    protected processGetTagItems(response: HttpResponseBase): Observable<TagItemQuery[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(TagItemQuery.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getTaggedItems(id: number): Observable<TaggedItemsQuery[]> {
+        let url_ = this.baseUrl + "/api/Tagging/tagged-items/{id}";
+        if (id === undefined || id === null)
+            throw new Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTaggedItems(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTaggedItems(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TaggedItemsQuery[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TaggedItemsQuery[]>;
+        }));
+    }
+
+    protected processGetTaggedItems(response: HttpResponseBase): Observable<TaggedItemsQuery[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(TaggedItemsQuery.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    getAllTaggedItems(): Observable<AllTaggedItemsQuery[]> {
+        let url_ = this.baseUrl + "/api/Tagging/tagged-items/all";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllTaggedItems(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllTaggedItems(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AllTaggedItemsQuery[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AllTaggedItemsQuery[]>;
+        }));
+    }
+
+    protected processGetAllTaggedItems(response: HttpResponseBase): Observable<AllTaggedItemsQuery[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(AllTaggedItemsQuery.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    filterByTagName(filter: string | null): Observable<FilterByTagQuery[]> {
+        let url_ = this.baseUrl + "/api/Tagging/{filter}";
+        if (filter === undefined || filter === null)
+            throw new Error("The parameter 'filter' must be defined.");
+        url_ = url_.replace("{filter}", encodeURIComponent("" + filter));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processFilterByTagName(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processFilterByTagName(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FilterByTagQuery[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FilterByTagQuery[]>;
+        }));
+    }
+
+    protected processFilterByTagName(response: HttpResponseBase): Observable<FilterByTagQuery[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(FilterByTagQuery.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    createTagItem(createTagItemCommand: CreateTagItemCommand): Observable<number> {
+        let url_ = this.baseUrl + "/api/Tagging/CreateTagItem";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(createTagItemCommand);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateTagItem(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateTagItem(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<number>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<number>;
+        }));
+    }
+
+    protected processCreateTagItem(response: HttpResponseBase): Observable<number> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : <any>null;
+    
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    updateTagItem(updateTagItemCommand: UpdateTagItemCommand): Observable<FileResponse> {
+        let url_ = this.baseUrl + "/api/Tagging/UpdateTagItem";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(updateTagItemCommand);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/octet-stream"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateTagItem(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateTagItem(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FileResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FileResponse>;
+        }));
+    }
+
+    protected processUpdateTagItem(response: HttpResponseBase): Observable<FileResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
 export interface ITodoItemsClient {
     getTodoItemsWithPagination(listId: number | undefined, pageNumber: number | undefined, pageSize: number | undefined): Observable<PaginatedListOfTodoItemBriefDto>;
     create(command: CreateTodoItemCommand): Observable<number>;
     update(id: number, command: UpdateTodoItemCommand): Observable<FileResponse>;
     delete(id: number): Observable<FileResponse>;
     updateItemDetails(id: number | undefined, command: UpdateTodoItemDetailCommand): Observable<FileResponse>;
+    removeTag(id: number | undefined, removeTaggedTodoItem: RemoveTaggedTodoItemCommand): Observable<FileResponse>;
 }
 
 @Injectable({
@@ -304,9 +657,64 @@ export class TodoItemsClient implements ITodoItemsClient {
         }
         return _observableOf(null as any);
     }
+
+    removeTag(id: number | undefined, removeTaggedTodoItem: RemoveTaggedTodoItemCommand): Observable<FileResponse> {
+        let url_ = this.baseUrl + "/api/TodoItems/RemoveTag?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(removeTaggedTodoItem);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/octet-stream"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRemoveTag(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRemoveTag(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<FileResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<FileResponse>;
+        }));
+    }
+
+    protected processRemoveTag(response: HttpResponseBase): Observable<FileResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            const fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+            const fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 export interface ITodoListsClient {
+    searchTodoList(search: string | null): Observable<TodosVm>;
     get(): Observable<TodosVm>;
     create(command: CreateTodoListCommand): Observable<number>;
     get2(id: number): Observable<FileResponse>;
@@ -325,6 +733,57 @@ export class TodoListsClient implements ITodoListsClient {
     constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
         this.http = http;
         this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    searchTodoList(search: string | null): Observable<TodosVm> {
+        let url_ = this.baseUrl + "/api/TodoLists/search-todolist/{search}";
+        if (search === undefined || search === null)
+            throw new Error("The parameter 'search' must be defined.");
+        url_ = url_.replace("{search}", encodeURIComponent("" + search));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSearchTodoList(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSearchTodoList(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TodosVm>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TodosVm>;
+        }));
+    }
+
+    protected processSearchTodoList(response: HttpResponseBase): Observable<TodosVm> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = TodosVm.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
     }
 
     get(): Observable<TodosVm> {
@@ -653,6 +1112,326 @@ export class WeatherForecastClient implements IWeatherForecastClient {
     }
 }
 
+export class TagItemQuery implements ITagItemQuery {
+    id?: number;
+    tagName?: string | undefined;
+
+    constructor(data?: ITagItemQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.tagName = _data["tagName"];
+        }
+    }
+
+    static fromJS(data: any): TagItemQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new TagItemQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["tagName"] = this.tagName;
+        return data;
+    }
+}
+
+export interface ITagItemQuery {
+    id?: number;
+    tagName?: string | undefined;
+}
+
+export class TaggedItemsQuery implements ITaggedItemsQuery {
+    id?: number;
+    tagName?: string | undefined;
+    todoItems?: TodoTagItemBriefVM[] | undefined;
+
+    constructor(data?: ITaggedItemsQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.tagName = _data["tagName"];
+            if (Array.isArray(_data["todoItems"])) {
+                this.todoItems = [] as any;
+                for (let item of _data["todoItems"])
+                    this.todoItems!.push(TodoTagItemBriefVM.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): TaggedItemsQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new TaggedItemsQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["tagName"] = this.tagName;
+        if (Array.isArray(this.todoItems)) {
+            data["todoItems"] = [];
+            for (let item of this.todoItems)
+                data["todoItems"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface ITaggedItemsQuery {
+    id?: number;
+    tagName?: string | undefined;
+    todoItems?: TodoTagItemBriefVM[] | undefined;
+}
+
+export class TodoTagItemBriefVM implements ITodoTagItemBriefVM {
+    id?: number;
+    listId?: number;
+    title?: string | undefined;
+    done?: boolean;
+
+    constructor(data?: ITodoTagItemBriefVM) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.listId = _data["listId"];
+            this.title = _data["title"];
+            this.done = _data["done"];
+        }
+    }
+
+    static fromJS(data: any): TodoTagItemBriefVM {
+        data = typeof data === 'object' ? data : {};
+        let result = new TodoTagItemBriefVM();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["listId"] = this.listId;
+        data["title"] = this.title;
+        data["done"] = this.done;
+        return data;
+    }
+}
+
+export interface ITodoTagItemBriefVM {
+    id?: number;
+    listId?: number;
+    title?: string | undefined;
+    done?: boolean;
+}
+
+export class AllTaggedItemsQuery implements IAllTaggedItemsQuery {
+    id?: number;
+    tagName?: string | undefined;
+    todoItems?: TodoTagItemBriefVM[] | undefined;
+
+    constructor(data?: IAllTaggedItemsQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.tagName = _data["tagName"];
+            if (Array.isArray(_data["todoItems"])) {
+                this.todoItems = [] as any;
+                for (let item of _data["todoItems"])
+                    this.todoItems!.push(TodoTagItemBriefVM.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AllTaggedItemsQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new AllTaggedItemsQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["tagName"] = this.tagName;
+        if (Array.isArray(this.todoItems)) {
+            data["todoItems"] = [];
+            for (let item of this.todoItems)
+                data["todoItems"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IAllTaggedItemsQuery {
+    id?: number;
+    tagName?: string | undefined;
+    todoItems?: TodoTagItemBriefVM[] | undefined;
+}
+
+export class FilterByTagQuery implements IFilterByTagQuery {
+    tagName?: string | undefined;
+    id?: number;
+    todoItems?: TodoTagItemBriefVM[] | undefined;
+
+    constructor(data?: IFilterByTagQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tagName = _data["tagName"];
+            this.id = _data["id"];
+            if (Array.isArray(_data["todoItems"])) {
+                this.todoItems = [] as any;
+                for (let item of _data["todoItems"])
+                    this.todoItems!.push(TodoTagItemBriefVM.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): FilterByTagQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new FilterByTagQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["tagName"] = this.tagName;
+        data["id"] = this.id;
+        if (Array.isArray(this.todoItems)) {
+            data["todoItems"] = [];
+            for (let item of this.todoItems)
+                data["todoItems"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IFilterByTagQuery {
+    tagName?: string | undefined;
+    id?: number;
+    todoItems?: TodoTagItemBriefVM[] | undefined;
+}
+
+export class CreateTagItemCommand implements ICreateTagItemCommand {
+    tagName?: string | undefined;
+
+    constructor(data?: ICreateTagItemCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.tagName = _data["tagName"];
+        }
+    }
+
+    static fromJS(data: any): CreateTagItemCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateTagItemCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["tagName"] = this.tagName;
+        return data;
+    }
+}
+
+export interface ICreateTagItemCommand {
+    tagName?: string | undefined;
+}
+
+export class UpdateTagItemCommand implements IUpdateTagItemCommand {
+    id?: number;
+    tagName?: string | undefined;
+
+    constructor(data?: IUpdateTagItemCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.tagName = _data["tagName"];
+        }
+    }
+
+    static fromJS(data: any): UpdateTagItemCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateTagItemCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["tagName"] = this.tagName;
+        return data;
+    }
+}
+
+export interface IUpdateTagItemCommand {
+    id?: number;
+    tagName?: string | undefined;
+}
+
 export class PaginatedListOfTodoItemBriefDto implements IPaginatedListOfTodoItemBriefDto {
     items?: TodoItemBriefDto[];
     pageNumber?: number;
@@ -852,8 +1631,10 @@ export interface IUpdateTodoItemCommand {
 export class UpdateTodoItemDetailCommand implements IUpdateTodoItemDetailCommand {
     id?: number;
     listId?: number;
+    tagItemId?: number | undefined;
     priority?: PriorityLevel;
     note?: string | undefined;
+    colour?: string | undefined;
 
     constructor(data?: IUpdateTodoItemDetailCommand) {
         if (data) {
@@ -868,8 +1649,10 @@ export class UpdateTodoItemDetailCommand implements IUpdateTodoItemDetailCommand
         if (_data) {
             this.id = _data["id"];
             this.listId = _data["listId"];
+            this.tagItemId = _data["tagItemId"];
             this.priority = _data["priority"];
             this.note = _data["note"];
+            this.colour = _data["colour"];
         }
     }
 
@@ -884,8 +1667,10 @@ export class UpdateTodoItemDetailCommand implements IUpdateTodoItemDetailCommand
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["listId"] = this.listId;
+        data["tagItemId"] = this.tagItemId;
         data["priority"] = this.priority;
         data["note"] = this.note;
+        data["colour"] = this.colour;
         return data;
     }
 }
@@ -893,8 +1678,10 @@ export class UpdateTodoItemDetailCommand implements IUpdateTodoItemDetailCommand
 export interface IUpdateTodoItemDetailCommand {
     id?: number;
     listId?: number;
+    tagItemId?: number | undefined;
     priority?: PriorityLevel;
     note?: string | undefined;
+    colour?: string | undefined;
 }
 
 export enum PriorityLevel {
@@ -904,9 +1691,50 @@ export enum PriorityLevel {
     High = 3,
 }
 
+export class RemoveTaggedTodoItemCommand implements IRemoveTaggedTodoItemCommand {
+    todoItemID?: number;
+    tagItemID?: number;
+
+    constructor(data?: IRemoveTaggedTodoItemCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.todoItemID = _data["todoItemID"];
+            this.tagItemID = _data["tagItemID"];
+        }
+    }
+
+    static fromJS(data: any): RemoveTaggedTodoItemCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new RemoveTaggedTodoItemCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["todoItemID"] = this.todoItemID;
+        data["tagItemID"] = this.tagItemID;
+        return data;
+    }
+}
+
+export interface IRemoveTaggedTodoItemCommand {
+    todoItemID?: number;
+    tagItemID?: number;
+}
+
 export class TodosVm implements ITodosVm {
     priorityLevels?: PriorityLevelDto[];
     lists?: TodoListDto[];
+    colour?: ColourDto[];
 
     constructor(data?: ITodosVm) {
         if (data) {
@@ -928,6 +1756,11 @@ export class TodosVm implements ITodosVm {
                 this.lists = [] as any;
                 for (let item of _data["lists"])
                     this.lists!.push(TodoListDto.fromJS(item));
+            }
+            if (Array.isArray(_data["colour"])) {
+                this.colour = [] as any;
+                for (let item of _data["colour"])
+                    this.colour!.push(ColourDto.fromJS(item));
             }
         }
     }
@@ -951,6 +1784,11 @@ export class TodosVm implements ITodosVm {
             for (let item of this.lists)
                 data["lists"].push(item.toJSON());
         }
+        if (Array.isArray(this.colour)) {
+            data["colour"] = [];
+            for (let item of this.colour)
+                data["colour"].push(item.toJSON());
+        }
         return data;
     }
 }
@@ -958,6 +1796,7 @@ export class TodosVm implements ITodosVm {
 export interface ITodosVm {
     priorityLevels?: PriorityLevelDto[];
     lists?: TodoListDto[];
+    colour?: ColourDto[];
 }
 
 export class PriorityLevelDto implements IPriorityLevelDto {
@@ -1112,6 +1951,42 @@ export interface ITodoItemDto {
     note?: string | undefined;
 }
 
+export class ColourDto implements IColourDto {
+    colour?: string | undefined;
+
+    constructor(data?: IColourDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.colour = _data["colour"];
+        }
+    }
+
+    static fromJS(data: any): ColourDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ColourDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["colour"] = this.colour;
+        return data;
+    }
+}
+
+export interface IColourDto {
+    colour?: string | undefined;
+}
+
 export class CreateTodoListCommand implements ICreateTodoListCommand {
     title?: string | undefined;
 
@@ -1151,6 +2026,7 @@ export interface ICreateTodoListCommand {
 export class UpdateTodoListCommand implements IUpdateTodoListCommand {
     id?: number;
     title?: string | undefined;
+    colour?: string | undefined;
 
     constructor(data?: IUpdateTodoListCommand) {
         if (data) {
@@ -1165,6 +2041,7 @@ export class UpdateTodoListCommand implements IUpdateTodoListCommand {
         if (_data) {
             this.id = _data["id"];
             this.title = _data["title"];
+            this.colour = _data["colour"];
         }
     }
 
@@ -1179,6 +2056,7 @@ export class UpdateTodoListCommand implements IUpdateTodoListCommand {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["title"] = this.title;
+        data["colour"] = this.colour;
         return data;
     }
 }
@@ -1186,6 +2064,7 @@ export class UpdateTodoListCommand implements IUpdateTodoListCommand {
 export interface IUpdateTodoListCommand {
     id?: number;
     title?: string | undefined;
+    colour?: string | undefined;
 }
 
 export class WeatherForecast implements IWeatherForecast {

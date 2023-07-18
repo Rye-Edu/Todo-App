@@ -15,6 +15,7 @@ public class Colour : ValueObject
         Code = code;
     }
 
+    public static IEnumerable<Colour> Colors { get;  } = GetSupportedColors();
     public static Colour From(string code)
     {
         var colour = new Colour { Code = code };
@@ -78,5 +79,9 @@ public class Colour : ValueObject
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return Code;
+    }
+
+    public static IEnumerable<Colour> GetSupportedColors() {
+        return SupportedColours.ToList();
     }
 }
