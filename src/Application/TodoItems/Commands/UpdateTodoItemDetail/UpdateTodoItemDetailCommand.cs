@@ -37,7 +37,9 @@ public class UpdateTodoItemDetailCommandHandler : IRequestHandler<UpdateTodoItem
     {
         var entity = await _context.TodoItems
             .FindAsync(new object[] { request.Id }, cancellationToken);
+
         var tagItem = await _context.TagItems.Include(todos => todos.TodoItems).SingleOrDefaultAsync(id=> id.Id== request.TagItemId);
+
         if (entity == null)
         {
             throw new NotFoundException(nameof(TodoItem), request.Id);
@@ -52,7 +54,7 @@ public class UpdateTodoItemDetailCommandHandler : IRequestHandler<UpdateTodoItem
         entity.ListId = request.ListId;
         entity.Priority = request.Priority;
         entity.Note = request.Note;
-        entity.Colour = (Colour)request.Colour!;
+        entity.Colour = String.IsNullOrEmpty(request.Colour) ? Colour.White : (Colour)request.Colour;
 
         
  

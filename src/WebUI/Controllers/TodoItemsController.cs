@@ -49,7 +49,6 @@ public class TodoItemsController : ApiControllerBase
     }
 
     [HttpPut("[action]")]
-
     public async Task<ActionResult> RemoveTag(int id, RemoveTaggedTodoItemCommand removeTaggedTodoItem) {
 
         if (id != removeTaggedTodoItem.TodoItemID) {

@@ -16,7 +16,7 @@ public class TaggedTodoItemAddedEventHandler: INotificationHandler<TaggedTodoIte
     public Task Handle(TaggedTodoItemAddedEvent notification, CancellationToken cancellationToken)
     {
         
-            notification.TagItem!.TodoItems!.Add(notification.TodoItem);
+         notification.TagItem!.TodoItems!.Add(notification.TodoItem);
             
         return Task.CompletedTask;
     }
